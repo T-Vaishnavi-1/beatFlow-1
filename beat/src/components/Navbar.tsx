@@ -1,6 +1,6 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
-import { Music, Gamepad2 } from "lucide-react";
+import { Music, Gamepad2, Bookmark } from "lucide-react";
 import ThemeToggle from "./ThemeToggle";
 
 const Navbar = () => {
@@ -32,22 +32,46 @@ const Navbar = () => {
         </Link>
 
         <div className="flex items-center gap-4">
-          <button onClick={handleHomeClick} className="text-foreground hover:text-primary transition-colors font-medium">
+          <button
+            onClick={handleHomeClick}
+            className="text-foreground hover:text-primary transition-colors font-medium"
+          >
             Home
           </button>
-          <a href="#about" onClick={handleAboutClick} className="text-foreground hover:text-primary transition-colors font-medium">
+
+          <a
+            href="#about"
+            onClick={handleAboutClick}
+            className="text-foreground hover:text-primary transition-colors font-medium"
+          >
             About
           </a>
-          <Link to="/game" className="flex items-center gap-1 text-foreground hover:text-primary transition-colors font-medium">
+
+          <Link
+            to="/game"
+            className="flex items-center gap-1 text-foreground hover:text-primary transition-colors font-medium"
+          >
             Game
           </Link>
+
+          {/* ⭐ ADDED: Saved Songs Link */}
+          <Link
+            to="/saved"
+            className="flex items-center gap-1 text-foreground hover:text-primary transition-colors font-medium"
+          >
+            <Bookmark className="w-4 h-4" />
+            Saved
+          </Link>
+
           <ThemeToggle />
+
           <div className="flex gap-2">
             <Link to="/login">
               <Button variant="ghost" className="hover:bg-primary/10">
                 Login
               </Button>
             </Link>
+
             <Link to="/signup">
               <Button className="bg-gradient-to-r from-primary via-accent to-secondary hover:opacity-90 transition-opacity">
                 Sign Up

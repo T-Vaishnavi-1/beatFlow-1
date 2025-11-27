@@ -27,7 +27,7 @@ const Index = () => {
         "Express yourself with improvisational movements and creativity. Let the music guide you through spontaneous, unique dance expressions.",
       icon: "🌟",
       difficulty: "Beginner-Friendly",
-      video: "https://www.youtube.com/embed/9bZkp7q19f0",
+      video: "https://youtube.com/shorts/7MQPm_dCF8o?si=FQ_PhsiXpn-4wSEH",
       features: [
         "No fixed choreography - pure creativity",
         "Adaptable to any music genre",
@@ -40,7 +40,7 @@ const Index = () => {
         "Electronic dance styles synchronized with remix beats. High-energy moves perfectly timed to drops, builds, and electronic rhythms.",
       icon: "🎧",
       difficulty: "Intermediate",
-      video: "https://www.youtube.com/embed/5NV6Rdv1a3I",
+      video: "https://youtube.com/shorts/xmpsoAjXrRA?si=8Ks6kKheiEJuuU05",
       features: [
         "Synced to EDM and electronic music",
         "Club-style movements and energy",
@@ -53,7 +53,7 @@ const Index = () => {
         "Fluid movements blending ballet and modern dance. An expressive style that combines technical precision with emotional storytelling.",
       icon: "💫",
       difficulty: "Advanced",
-      video: "https://www.youtube.com/embed/CjX4JmhBWxE",
+      video: "https://youtube.com/shorts/KlWXI8KFUac?si=SnS8LhorI4nMjkzQ",
       features: [
         "Ballet technique meets modern flow",
         "Floor work and lyrical movements",
@@ -66,7 +66,7 @@ const Index = () => {
         "Acrobatic moves with power, freezes, and footwork. One of the original elements of hip-hop culture with gravity-defying moves.",
       icon: "⚡",
       difficulty: "Advanced",
-      video: "https://www.youtube.com/embed/Wj6ANy-jQ0A",
+      video: "https://youtube.com/shorts/G4xn9pgOzm0?si=H9drWyJ_nNmoblzC",
       features: [
         "Power moves and freezes",
         "Top rock and dynamic footwork",
@@ -79,7 +79,7 @@ const Index = () => {
         "Dynamic style with sharp movements and theatrical flair. Broadway-inspired dance with high energy and show-stopping presence.",
       icon: "🎭",
       difficulty: "Intermediate",
-      video: "https://www.youtube.com/embed/bSyY5oO7glk",
+      video: "https://youtube.com/shorts/wo8O0REQFMg?si=pDy2GQqdb3ghCfSt",
       features: [
         "Sharp isolations and turns",
         "Broadway musical style",
@@ -95,7 +95,7 @@ const Index = () => {
         "Rhythmic footwork using tap shoes to create crisp beats and musical patterns.",
       icon: "👞",
       difficulty: "Intermediate",
-      video: "https://www.youtube.com/embed/G7Qp6-6kN2Y",
+      video: "https://youtube.com/shorts/89icJQ5Y_qE?si=Q0RWluB9zrEoBq7c",
       features: [
         "Fast rhythmic footwork",
         "Musicality and timing",
@@ -108,7 +108,7 @@ const Index = () => {
         "A lively Brazilian dance full of rhythm, bounce, and celebratory movement.",
       icon: "💃",
       difficulty: "Intermediate",
-      video: "https://www.youtube.com/embed/l_E6TiqS308",
+      video: "https://youtube.com/shorts/GkMa0tOD0KA?si=r9ufzC7FD-jLw_iT",
       features: [
         "Fast-paced hip movement",
         "Energetic footwork",
@@ -121,7 +121,7 @@ const Index = () => {
         "A passionate Latin dance with energetic partner dynamics and rhythmic flair.",
       icon: "🔥",
       difficulty: "Beginner to Intermediate",
-      video: "https://www.youtube.com/embed/8vS3j1jvR2o",
+      video: "https://youtube.com/shorts/KavEKC_9klk?si=rFBQXOvSIqAFEgJl",
       features: [
         "Quick foot patterns",
         "Partner and solo movements",
@@ -134,7 +134,7 @@ const Index = () => {
         "Highly technical dance form emphasizing grace, precision, and strong foundation.",
       icon: "🩰",
       difficulty: "Advanced",
-      video: "https://www.youtube.com/embed/XF9ZV_1dHq8",
+      video: "https://youtube.com/shorts/ZYHUIVwaeyY?si=2bmKR_TCI_6mlh_v",
       features: [
         "Strong foundational technique",
         "Poise, control, and balance",
@@ -147,7 +147,7 @@ const Index = () => {
         "High-energy African dance with expressive full-body movements and rhythm.",
       icon: "🌍",
       difficulty: "Intermediate",
-      video: "https://www.youtube.com/embed/IevYJxgOZ-A",
+      video: "https://youtube.com/shorts/qeUD1gtuXhM?si=VG3NLV4_Ikx0Mm3j",
       features: [
         "Full-body expressive moves",
         "African cultural foundations",
@@ -160,7 +160,7 @@ const Index = () => {
         "Vibrant Indian dance style combining classical, folk, hip-hop, and cinematic expressions.",
       icon: "🎬",
       difficulty: "Beginner-Friendly",
-      video: "https://www.youtube.com/embed/4F1qY0uA-ho",
+      video: "https://youtube.com/shorts/Hq3xGwnC3AU?si=Hs3_t0Hb8hkVQ_Fy",
       features: [
         "Expressive storytelling",
         "Mix of Indian + Western styles",

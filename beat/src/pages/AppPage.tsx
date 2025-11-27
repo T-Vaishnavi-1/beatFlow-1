@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useCallback } from "react";
 import { useNavigate } from "react-router-dom";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
@@ -13,6 +13,18 @@ import songsData from "../data/songs.json";
 import instrumentsData from "../data/instruments.json";
 import awardsData from "../data/awards.json";
 
+// NOTE: Keeping this local storage helper function for now,
+// but it is no longer used for saved/favorite songs in the new logic.
+const getLocalData = (key: string, defaultValue: any = []) => {
+  const data = localStorage.getItem(key);
+  try {
+    return data ? JSON.parse(data) : defaultValue;
+  } catch (e) {
+    console.error(`Error parsing local storage key: ${key}`, e);
+    return defaultValue;
+  }
+};
+
 type Song = {
   id: number;
   title: string;
@@ -24,8 +36,10 @@ type Song = {
 const AppPage: React.FC = () => {
   const navigate = useNavigate();
 
-  const [likedSongs, setLikedSongs] = useState<number[]>([]);
-  const [savedSongs, setSavedSongs] = useState<number[]>([]);
+  const [favoriteIds, setFavoriteIds] = useState<number[]>([]);
+  const [savedIds, setSavedIds] = useState<number[]>([]);
+  
+  const [currentUser, setCurrentUser] = useState<string | null>(null); 
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
   const [currentAudio, setCurrentAudio] = useState<HTMLAudioElement | null>(null);
@@ -71,41 +85,154 @@ const AppPage: React.FC = () => {
   const awards = awardsData;
   const awardYears = Object.keys(awards);
 
+  // --- MODIFIED: Fetch saved/favorite IDs from the backend ---
   useEffect(() => {
-    const currentUser = localStorage.getItem("currentUser");
-    setIsLoggedIn(!!currentUser);
+    const user = localStorage.getItem("currentUser");
+    setCurrentUser(user);
+    setIsLoggedIn(!!user);
 
-    setLikedSongs(JSON.parse(localStorage.getItem("likedSongs") || "[]"));
-    setSavedSongs(JSON.parse(localStorage.getItem("savedSongs") || "[]"));
-  }, []);
+    const fetchUserData = async (userKey: string) => {
+        // You'll need a way to get the real auth token here, assuming currentUser is the key/token
+        const userToken = userKey; 
+
+        try {
+            // Fetch Favorites
+            const favResponse = await fetch('/api/user/favorites', {
+                headers: { 'Authorization': `Bearer ${userToken}` }
+            });
+            if (favResponse.ok) {
+                const data = await favResponse.json();
+                // Assuming backend returns { favoriteSongIds: number[] }
+                setFavoriteIds(data.favoriteSongIds || []); 
+            } else {
+                console.error("Failed to fetch favorites from API.");
+            }
+
+            // Fetch Saved Songs
+            const savedResponse = await fetch('/api/user/saved', {
+                headers: { 'Authorization': `Bearer ${userToken}` }
+            });
+            if (savedResponse.ok) {
+                const data = await savedResponse.json();
+                // Assuming backend returns { savedSongIds: number[] }
+                setSavedIds(data.savedSongIds || []);
+            } else {
+                console.error("Failed to fetch saved songs from API.");
+            }
+        } catch (error) {
+            console.error("Network error fetching user data:", error);
+            toast.error("Could not load user data from the server.");
+        }
+    };
+
+    if (user) {
+        fetchUserData(user);
+    } else {
+        setFavoriteIds([]);
+        setSavedIds([]);
+    }
+  }, []); // Run only once on mount
 
   const handleLogout = () => {
     localStorage.removeItem("currentUser");
+    setFavoriteIds([]);
+    setSavedIds([]);
+    setCurrentUser(null);
+    setIsLoggedIn(false);
     toast.success("Logged out successfully");
     navigate("/");
   };
+  
+  // --- MODIFIED: toggleLike with API Call ---
+  const toggleLike = useCallback((songId: number) => {
+    if (!currentUser) return toast.error("Please login to favorite songs");
 
-  const toggleLike = (songId: number) => {
-    if (!isLoggedIn) return toast.error("Please login to like songs");
+    const isCurrentlyFav = favoriteIds.includes(songId);
+    
+    // Optimistic Update
+    const prevIds = favoriteIds;
+    const newFavIds = isCurrentlyFav 
+        ? prevIds.filter((id) => id !== songId) 
+        : [...prevIds, songId];
+    setFavoriteIds(newFavIds);
 
-    const updated = likedSongs.includes(songId)
-      ? likedSongs.filter((id) => id !== songId)
-      : [...likedSongs, songId];
+    const toggleOnBackend = async () => {
+        const userToken = currentUser; // Assuming currentUser holds the token
+        const endpoint = `/api/songs/${songId}/favorite`; 
+        const method = isCurrentlyFav ? 'DELETE' : 'PUT';
 
-    setLikedSongs(updated);
-    localStorage.setItem("likedSongs", JSON.stringify(updated));
-  };
+        try {
+            const response = await fetch(endpoint, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${userToken}` 
+                },
+            });
 
-  const toggleSave = (songId: number) => {
-    if (!isLoggedIn) return toast.error("Please login to save songs");
+            if (!response.ok) {
+                // Rollback state and show error
+                setFavoriteIds(prevIds); 
+                toast.error(`Failed to ${isCurrentlyFav ? 'unfavorite' : 'favorite'} song.`);
+            } else {
+                toast.success(`Song ${isCurrentlyFav ? 'removed from' : 'added to'} favorites!`);
+            }
+        } catch (error) {
+            console.error("API error during toggleLike:", error);
+            // Rollback on network error
+            setFavoriteIds(prevIds); 
+            toast.error("Network error. Try again.");
+        }
+    };
 
-    const updated = savedSongs.includes(songId)
-      ? savedSongs.filter((id) => id !== songId)
-      : [...savedSongs, songId];
+    toggleOnBackend();
+  }, [currentUser, favoriteIds]);
 
-    setSavedSongs(updated);
-    localStorage.setItem("savedSongs", JSON.stringify(updated));
-  };
+  // --- MODIFIED: toggleSave with API Call ---
+  const toggleSave = useCallback((songId: number) => {
+    if (!currentUser) return toast.error("Please login to save songs");
+
+    const isCurrentlySaved = savedIds.includes(songId);
+    
+    // Optimistic Update
+    const prevIds = savedIds;
+    const newSavedIds = isCurrentlySaved 
+        ? prevIds.filter((id) => id !== songId) 
+        : [...prevIds, songId];
+    setSavedIds(newSavedIds);
+
+    const toggleOnBackend = async () => {
+        const userToken = currentUser; // Assuming currentUser holds the token
+        const endpoint = `/api/songs/${songId}/save`; 
+        const method = isCurrentlySaved ? 'DELETE' : 'PUT';
+
+        try {
+            const response = await fetch(endpoint, {
+                method: method,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${userToken}` 
+                },
+            });
+
+            if (!response.ok) {
+                // Rollback state and show error
+                setSavedIds(prevIds); 
+                toast.error(`Failed to ${isCurrentlySaved ? 'unsave' : 'save'} song.`);
+            } else {
+                toast.success(`Song ${isCurrentlySaved ? 'unsaved' : 'saved'} successfully!`);
+            }
+        } catch (error) {
+            console.error("API error during toggleSave:", error);
+            // Rollback on network error
+            setSavedIds(prevIds); 
+            toast.error("Network error. Try again.");
+        }
+    };
+
+    toggleOnBackend();
+  }, [currentUser, savedIds]);
+
 
   return (
     <div
@@ -162,15 +289,15 @@ const AppPage: React.FC = () => {
                 image={song.image}
                 title={song.title}
                 artist={song.artist}
-                isFav={likedSongs.includes(song.id)}
-                isSaved={savedSongs.includes(song.id)}
-                disabled={playingInstrumentId !== null}  // ⭐ NEW
-                //disableMessage="Please pause instrument audio before opening choreography."
-                  onDisabledClick={() =>
-    toast.error("🎵 Please pause instrument audio before opening choreography.", {
-      description: "Stop the instrument audio to view DanceBeats choreography.",
-    })
-  }
+                // Use API-fetched IDs
+                isFav={favoriteIds.includes(song.id)}
+                isSaved={savedIds.includes(song.id)}
+                disabled={playingInstrumentId !== null}  
+                onDisabledClick={() =>
+                  toast.error("🎵 Please pause instrument audio before opening choreography.", {
+                    description: "Stop the instrument audio to view DanceBeats choreography.",
+                  })
+                }
                 onClick={() => {
                   if (!isLoggedIn)
                     return toast.error("Please login to view choreography");

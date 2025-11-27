@@ -8,11 +8,13 @@ import { ArrowLeft, Eye, EyeOff, Music } from "lucide-react";
 import { toast } from "sonner";
 import PasswordStrength from "@/components/PasswordStrength";
 import signupBg from "@/assets/signup-bg.jpg";
+import axios from "axios";
 
 const Signup = () => {
   const navigate = useNavigate();
   const [showPassword, setShowPassword] = useState(false);
   const [showConfirmPassword, setShowConfirmPassword] = useState(false);
+
   const [formData, setFormData] = useState({
     username: "",
     email: "",
@@ -28,27 +30,23 @@ const Signup = () => {
   };
 
   const validateForm = () => {
-    // Username validation
     if (formData.username.length < 3) {
       toast.error("Username must be at least 3 characters long");
       return false;
     }
 
-    // Email validation
     const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
     if (!emailRegex.test(formData.email)) {
       toast.error("Please enter a valid email address");
       return false;
     }
 
-    // Password validation - at least 8 chars, 1 uppercase, 1 lowercase, 1 number
     const passwordRegex = /^(?=.*[a-z])(?=.*[A-Z])(?=.*\d).{8,}$/;
     if (!passwordRegex.test(formData.password)) {
       toast.error("Password must be at least 8 characters with uppercase, lowercase, and number");
       return false;
     }
 
-    // Confirm password
     if (formData.password !== formData.confirmPassword) {
       toast.error("Passwords do not match");
       return false;
@@ -57,37 +55,36 @@ const Signup = () => {
     return true;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
+
     if (!validateForm()) return;
 
-    // For now, just store in localStorage (will be replaced with backend)
-    const users = JSON.parse(localStorage.getItem("users") || "[]");
-    
-    // Check if user already exists
-    if (users.some((u: any) => u.email === formData.email)) {
-      toast.error("User with this email already exists");
-      return;
-    }
+    try {
+      // ✅ ONLY CHANGE MADE: Correct Signup API URL
+      const res = await axios.post("http://localhost:5000/api/users/signup", {
+        username: formData.username,
+        email: formData.email,
+        password: formData.password
+      });
 
-    users.push({
-      username: formData.username,
-      email: formData.email,
-      password: formData.password
-    });
-    
-    localStorage.setItem("users", JSON.stringify(users));
-    toast.success("Account created successfully!");
-    navigate("/login");
+      if (res.status === 201) {
+        toast.success("Account created successfully!");
+        navigate("/login");
+      }
+    } catch (err: any) {
+      toast.error(err.response?.data?.message || "Signup failed. Try again.");
+    }
   };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-background relative overflow-hidden p-4">
+      
       <div 
         className="absolute inset-0 bg-cover bg-center z-0"
         style={{ backgroundImage: `url(${signupBg})` }}
       />
+
       <div className="absolute inset-0 bg-gradient-to-br from-primary/70 via-accent/60 to-secondary/70 z-10 animate-pulse-glow" />
       
       <Link to="/" className="absolute top-6 left-6 z-30">
@@ -110,6 +107,7 @@ const Signup = () => {
         
         <CardContent>
           <form onSubmit={handleSubmit} className="space-y-4">
+            
             <div className="space-y-2">
               <Label htmlFor="username">Username</Label>
               <Input
@@ -199,6 +197,7 @@ const Signup = () => {
               Login here
             </Link>
           </div>
+
         </CardContent>
       </Card>
     </div>

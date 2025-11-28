@@ -32,7 +32,7 @@ It supports multiple dance styles (Hip-Hop, Samba), beat detection using DSP, an
 
 
 final beat/
-├── Backend_project/        (Node.js/Express Backend)
+├── Backend_project/                     # Node.js / Express Backend
 │   ├── controllers/
 │   ├── middlewares/
 │   │   └── authMiddleware.js
@@ -47,11 +47,11 @@ final beat/
 │   │   └── userRoutes.js
 │   ├── temp_files/
 │   ├── .env
+│   ├── server.js
 │   ├── package.json
-│   ├── package-lock.json
-│   └── server.js
+│   └── package-lock.json
 │
-├── DanceBeat/              (React/Vite/TS Frontend)
+├── DanceBeat/                           # React + Vite + TypeScript Frontend
 │   ├── public/
 │   ├── src/
 │   │   ├── assets/
@@ -104,6 +104,8 @@ final beat/
 │   ├── vite.config.ts
 │   ├── README.md
 │   └── .gitignore
+│
+└── README.md
 
 ## ⚙ System Requirements
 ### Software
